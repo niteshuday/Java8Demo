@@ -1,16 +1,17 @@
 package com.nitesh.java8demo.stream;
 
+import com.nitesh.java8demo.Employee;
 import com.nitesh.java8demo.User;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.Comparator.comparingDouble;
+import static java.util.stream.Collectors.*;
 
 public class StreamTest {
     public static void main(String[] args) {
@@ -41,19 +42,41 @@ public class StreamTest {
 //        System.out.println(emails);
 
         //***********************Stream grouping****************************
-        String inputStr="vikasprajapat";
-        //1.Changing input String into array--> inputStr.split("")
-        Map<String, Long> map = Arrays.stream(inputStr.split(""))
-                .collect(
-        //Importing a static Collectors in th top of the class which is having
-        // grouping by method and counting method
-        // Grouping by required 2 function which is mentioned below
-                        groupingBy(
-                                Function.identity(), counting()
-                        )
-                );
-        System.out.println(map);
+//        String inputStr="vikasprajapat";
+//        //1.Changing input String into array--> inputStr.split("")
+//        Map<String, Long> map = Arrays.stream(inputStr.split(""))
+//                .collect(
+//        //Importing a static Collectors in th top of the class which is having
+//        // grouping by method and counting method
+//        // Grouping by required 2 function which is mentioned below
+//                        groupingBy(
+//                                Function.identity(), counting()
+//                        )
+//                );
+//        System.out.println(map);
 
+        //************************Stream grouping by**********************
+        List<Employee> employeeList= Stream.of(
+                new Employee(1,"Vikas","Dev",2000),
+                new Employee(2,"Divya","Dev",25000),
+                new Employee(3,"Nitesh","Support",25100),
+                new Employee(5,"Pankaj","Tech",50000),
+                new Employee(4,"Sri","Digital",51000),
+                new Employee(6,"Aishwarya","Digital",45000),
+                new Employee(6,"Dev","Support",45000)
+        ).collect(Collectors.toList());
+        //**** Approach 1 ******** order by max salary person with grouping by department
+//        Comparator<Employee> compareBySalary=Comparator.comparing(Employee::getSalary);
+//        Map<String, Optional<Employee>> map = employeeList.stream()
+//                .collect(groupingBy(Employee::getDept, Collectors.reducing(BinaryOperator.maxBy(compareBySalary))));
+//        System.out.println(map);
+        //**** Approach 2 ******** order by max salary person with grouping by department
+        Map<String, Employee> employeeMap = employeeList.stream().collect(
+                groupingBy(Employee::getDept,
+                        collectingAndThen(
+                                maxBy(comparingDouble(Employee::getSalary)), Optional::get))
+        );
+        System.out.println(employeeMap);
     }
     public static void printNum(int i){
         System.out.println(i);
